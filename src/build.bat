@@ -1,21 +1,10 @@
 @echo off
+if not exist ..\GameAPP mkdir ..\GameAPP
+g++ -std=c++20 -fmodules-ts -c GenericsProto.cpp
+g++ -std=c++20 -fmodules-ts -c Tic-Tac-Toe.cpp
+g++ -std=c++20 -fmodules-ts -c main.cpp
 
-if not exist ..\bin mkdir ..\bin
-if exist gmc.cache rmdir \s \q gmc.cache
-
-echo compiling...
-
-g++ -std=c++20 -fmodules-ts TicTacToe.cpp -c
-g++ -std=c++20 -fmodules-ts GameHandler.cpp -c
-g++ -std=c++20 -fmodules-ts main.cpp -c
-
-g++ -std=c++20 -fmodules-ts *.o -o ..\bin\app.exe
+g++ -std=c++20 -fmodules-ts -o ..\GameAPP\App GenericsProto.o Tic-Tac-Toe.o main.o 
 
 if exist *.o del *.o
-if exist gmc.cache rmdir \s \q gmc.cache
-
-echo DONE BAKING...
-
-echo RUNNING
-
-..\bin\app.exe
+..\GameAPP\App
