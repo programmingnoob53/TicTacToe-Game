@@ -1,14 +1,10 @@
 #include <iostream>
 
 import TicTacToe;
-import GameHandler;
 
-using namespace std;
-
-int main(int argc, char** argv)
+int main()
 {
-	GameHandler Obj;
-	Obj.Start();
-	
+	TicTacToe Obj;
+	Obj.StartGame();
 	return 0;
 }
