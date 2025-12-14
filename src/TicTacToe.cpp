@@ -1,134 +1,188 @@
 module;
 
+//file directives to include
 #include <string>
-#include <cassert>
 #include <sstream>
 #include <iostream>
 #include <cstdlib>
+import Generics;
+
+export module TicTacToe;
 
 
-export module TicTacToe;//module decleration
-using namespace std;
+enum GameThings{SPACE, STAR, CROSS};
+constexpr char GameDisplay[3] = {'.', '*', '+'};
 
-//==============================================Enumerations=========================================
-export enum GameThings
+export class TicTacToe : public Generics<GameThings>
 {
-        SPACE,
-        STAR,
-        CROSS,
+	public:
+		//using Generics<GameThings>::Generics;
+		TicTacToe();
+		~TicTacToe();
+		void StartGame();
+		std::string ShowGrid()const;
+	private:
+		//helper methods
+		bool Player_1_turn;
+		bool _blnContinue;
+		bool CheckWin(GameThings Thing) const;
+		bool isDraw()const;
+		void HandleTurn();
+		void HandleMovement(char cInput);
+		void PlaceInGrid(int Row, int Col);
+		void callStart();
+		//class constants
+		static constexpr int DefaultRows = 3;
+		static constexpr int DefaultCols = 3;
+		static constexpr GameThings DefaultValue = SPACE;
 };
 
-export enum GameTurn
+TicTacToe::TicTacToe() : Generics<GameThings>(DefaultRows, DefaultCols, DefaultValue)
 {
-        PLAYER_1,
-        PLAYER_2,
-};
-
-//===============================================Typedefs=============================================
-using Rows = GameThings*;
-using Grid = Rows*;
-
-//
-export class TicTacToe
-{
-        public:
-                TicTacToe();
-                ~TicTacToe();
-                //accessors
-                int getRows() const;
-                int getCols() const;
-                GameThings getChar(int r, int c) const;
-                std::string ShowGrid() const;
-                //bool IsDraw();
-                //mutators
-                void setCharAt(int r, int c, GameThings thing);
-        private:
-                int _Rows;
-                int _Cols;
-                Grid _grid;
-                void Alloc();
-                void Dealloc();
-                //utillity method
-                bool IsinGrd(int r, int c) const;
-                //class constants
-                static constexpr int DefaultCols = 3;
-                static constexpr int DefaultRows = 3;
-                static constexpr char GameChars[3] = {'.','*','+'};
-};
-
-//==========================================================public=====================================
-
-TicTacToe::TicTacToe()
-{
-        //assert(_grid == nullptr);//safety check
-        _Rows = DefaultRows;
-        _Cols = DefaultCols;
-        Alloc();
-}
-TicTacToe::~TicTacToe()
-{
-        //safety
-        assert(_grid != nullptr);
-        Dealloc();
+	Player_1_turn = true;
+	_blnContinue = true;
 }
 
-int TicTacToe::getRows() const{return _Rows;}
-int TicTacToe::getCols() const{return _Cols;}
+TicTacToe::~TicTacToe(){}
+std::string TicTacToe::ShowGrid()const
+{
+	std::stringstream ssShow;
+	for(int k = 0;k<getRows();k++)
+	{
+		for(int j = 0;j<getCols();j++)
+		{
+			ssShow<<GameDisplay[getValue(k, j)]<<' ';
+		}
+		ssShow<<"\n";
+	}
+	ssShow<<"For Player "<<(Player_1_turn ? "1 " : "2 ")<<"choose:\n";
+	ssShow<<"Q - UP_Left, "<<"W - UP_Mid, "<<"E - UP_Right\n";
+	ssShow<<"A - Mid_Left, "<<"S - Mid_Mid, "<<"D - Mid_Right\n";
+	ssShow<<"Z - Down_Left, "<<"X - Down_Mid, "<<"C - Down_Right\n";
+	ssShow<<"f-Quit\n";
+	return ssShow.str();
+}
+void TicTacToe::StartGame()
+{	
+	char Chchoice = '\0';
+	do{
+		system("cls");
+		std::cout<<ShowGrid();
+		std::cin>>Chchoice;
+		HandleMovement(tolower(Chchoice));
+	}while(_blnContinue);
+	std::cout<<"start game (y/n)? ";
+	std::cin>>Chchoice;
+	if(std::tolower(Chchoice) == 'y')
+	{
+		Reset(SPACE);
+		_blnContinue = true;
+		StartGame();
+	}
+	
+}
+
+void TicTacToe::HandleTurn()
+{
+	Player_1_turn = !Player_1_turn;
+}
+
+bool TicTacToe::CheckWin(GameThings Thing) const
+{
+	if(getValue(0, 0) == Thing && getValue(1, 1) == Thing && getValue(2, 2) == Thing)
+		return true;
+	if(getValue(0, 2) == Thing && getValue(1, 1) == Thing && getValue(2, 0) == Thing)
+		return true;
+	for(int k = 0; k<getRows();k++)
+	{
+		if(getValue(k, 0) == Thing && getValue(k, 1) == Thing && getValue(k, 2) == Thing)
+			return true;
+	}
+	for(int k = 0;k<getCols();k++)
+	{
+		if(getValue(0, k) == Thing && getValue(1, k) == Thing && getValue(2, k) == Thing)
+			return true;
+	}
+	//else
+	return false;
+}
+
+void TicTacToe::PlaceInGrid(int Row, int Col)
+{
+	if(getValue(Row, Col) == SPACE)
+	{
+		setValue(Row, Col, Player_1_turn ? STAR : CROSS);
+		bool PlayerWon = CheckWin(Player_1_turn ? STAR : CROSS);
+		if(PlayerWon)
+		{
+			system("cls");
+			std::cout<<ShowGrid();
+			std::cout<<"Player"<<(Player_1_turn ? " 1": " 2")<<" Won the Game!!\n";
+			_blnContinue = false;
+		}
+		HandleTurn();
+	}
+	else
+		std::cout<<"Cannot Place There\n";
+	
+}
+
+bool TicTacToe::isDraw()const
+{
+	for(int k = 0;k<getRows();k++)
+	{
+		for(int j = 0;j<getCols();j++)
+		{
+			if(getValue(k, j) == SPACE)
+				return false;
+		}
+	}
+	return true;
+}
 
 
-//============================================== Private =====================================================
-GameThings TicTacToe::getChar(int r, int c) const
+void TicTacToe::HandleMovement(char cInput)
 {
-        assert(IsinGrd(r, c));//check if the statement is true else quit
-        return _grid[r][c];
-}
-std::string TicTacToe::ShowGrid() const
-{
-        using namespace std;//safe to use here
-        stringstream ss;
-        ss<<"==============TicTacToe Game=========="<<endl;
-        for(int k = 0;k<_Rows; k++)
-        {
-                for(int j = 0;j<_Cols; j++)
-                {
-                        ss<<GameChars[_grid[k][j]]<<' ';//can i use static_cast
-                }
-                ss<<endl;
-        }
-        return ss.str();
-}
-                //mutators
-void TicTacToe::setCharAt(int r, int c, GameThings thing)
-{
-        assert(IsinGrd(r, c));
-        if(_grid[r][c] == SPACE)
-                 _grid[r][c] = thing;
-        else
-        {
-                cout<<"Cannot Place there!"<<endl;
-                system("pause");
-        }
-}
-void TicTacToe::Alloc()
-{
-        _grid = new Rows[_Rows];
-        for(int k = 0;k< _Rows;k++)
-        {
-                _grid[k] = new GameThings[_Cols];
-                for(int j = 0; j<_Cols;j++)
-                {
-                        _grid[k][j] = SPACE;
-                }
-        }
-}
-void TicTacToe::Dealloc()
-{
-        for(int k = 0;k<_Rows;k++)
-                delete[] _grid[k];
-        delete[] _grid;
-        _grid = nullptr;//avoid dangling memory
-}
-bool TicTacToe::IsinGrd(int r, int c) const
-{
-        return r>=0 && r<_Rows && c>=0 && c<_Cols;
+	switch(std::tolower(cInput))
+		{
+			case 'q':
+				PlaceInGrid(0, 0);
+				break;
+			case 'w':
+				PlaceInGrid(0, 1);
+				break;
+			case 'e':
+				PlaceInGrid(0, 2);
+				break;
+			case 'a':
+				PlaceInGrid(1, 0);
+				break;
+			case 's':
+				PlaceInGrid(1, 1);
+				break;
+			case 'd':
+				PlaceInGrid(1, 2);
+				break;
+			case 'z':
+				PlaceInGrid(2, 0);
+				break;
+			case 'x':
+				PlaceInGrid(2, 1);
+				break;
+			case 'c':
+				PlaceInGrid(2, 2);
+				break;
+			case 'f':
+				_blnContinue = false;
+				break;
+			default:
+			break;
+		}
+		if(isDraw())
+		{
+			system("cls");
+			std::cout<<ShowGrid();
+			std::cout<<"A game played perfect is a draw."<<std::endl;
+			_blnContinue = false;
+		}
 }
