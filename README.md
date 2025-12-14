@@ -32,6 +32,6 @@ Or using command line:
 g++ -std=c++20 -fmodules-ts GenericsProto.cpp -c
 g++ -std=c++20 -fmodules-ts TicTacToe.cpp -c
 g++ -std=c++20 -fmodules-ts main.cpp -c
-g++ -std=c++20 -fmodules-ts *.o -o App
+g++ -std=c++20 -fmodules-ts -o App GenericsProto.o TicTacToe.o main.o 
 ./App
 
