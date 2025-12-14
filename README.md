@@ -29,8 +29,8 @@ Example:
 Or using command line:
 
 ```bash
+g++ -std=c++20 -fmodules-ts GenericsProto.cpp -c
 g++ -std=c++20 -fmodules-ts TicTacToe.cpp -c
-g++ -std=c++20 -fmodules-ts GameHandler.cpp -c
 g++ -std=c++20 -fmodules-ts main.cpp -c
 g++ -std=c++20 -fmodules-ts *.o -o App
 ./App
