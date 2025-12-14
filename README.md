@@ -6,7 +6,7 @@ A simple console-based TicTacToe game built in modern C++ using modules.
 
 ## Features
 - 2-player turn system
-- Modular design with `TicTacToe` (game logic) and `GameHandler` (input/flow)
+- Modular design with `TicTacToe` (game logic)
 - Dynamic grid handling
 - Input validation
 - Console-based gameplay
